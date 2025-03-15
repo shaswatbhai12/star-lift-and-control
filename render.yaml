@@ -1,12 +1,14 @@
 services:
   - type: web
-    name: my-django-app
+    name: django-app
     env: python
-    plan: free
-    buildCommand: "pip install -r requirements.txt && python manage.py migrate"
-    startCommand: "gunicorn myproject.wsgi:application"
+    plan: free  # Ensures free tier usage
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python manage.py collectstatic --noinput && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     envVars:
-      - key: DATABASE_URL
-        value: "sqlite:///db.sqlite3"
-      - key: SECRET_KEY
-        generate: secret
+      - key: DJANGO_SECRET_KEY
+        sync: false  # Ensures the value is not displayed in logs
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: DEBUG
+        value: "False"
